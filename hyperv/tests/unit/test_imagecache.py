@@ -116,7 +116,9 @@ class ImageCacheTestCase(test_base.HyperVBaseTestCase):
             expected_path)
 
     @mock.patch.object(imagecache.ImageCache, '_resize_and_cache_vhd')
-    def test_get_cached_image_use_cow(self, mock_resize):
+    @mock.patch.object(imagecache.ImageCache, '_update_image_timestamp')
+    def test_get_cached_image_use_cow(self, mock_update_img_timestamp,
+                                      mock_resize):
         (expected_path,
          expected_vhd_path) = self._prepare_get_cached_image(True, True)
 
@@ -127,6 +129,8 @@ class ImageCacheTestCase(test_base.HyperVBaseTestCase):
         self.assertEqual(expected_resized_vhd_path, result)
 
         mock_resize.assert_called_once_with(self.instance, expected_vhd_path)
+        mock_update_img_timestamp.assert_called_once_with(
+            self.instance.image_ref)
 
     @mock.patch.object(imagecache.images, 'fetch')
     def test_cache_rescue_image_bigger_than_flavor(self, mock_fetch):
@@ -150,3 +154,41 @@ class ImageCacheTestCase(test_base.HyperVBaseTestCase):
                                            self.instance.project_id)
         self.imagecache._vhdutils.get_vhd_info.assert_called_once_with(
             expected_vhd_path)
+
+    def test_age_and_verify_cached_images(self):
+        fake_images = [mock.sentinel.FAKE_IMG1, mock.sentinel.FAKE_IMG2]
+        fake_used_images = [mock.sentinel.FAKE_IMG1]
+
+        self.imagecache.originals = fake_images
+        self.imagecache.used_images = fake_used_images
+
+        self.imagecache._update_image_timestamp = mock.Mock()
+        self.imagecache._remove_if_old_image = mock.Mock()
+
+        self.imagecache._age_and_verify_cached_images(
+            mock.sentinel.FAKE_CONTEXT,
+            mock.sentinel.all_instances,
+            mock.sentinel.FAKE_BASE_DIR)
+
+        self.imagecache._update_image_timestamp.assert_called_once_with(
+            mock.sentinel.FAKE_IMG1)
+        self.imagecache._remove_if_old_image.assert_called_once_with(
+            mock.sentinel.FAKE_IMG2)
+
+    @mock.patch.object(imagecache.ImageCache, '_get_image_backing_files')
+    def test_remove_if_old_image(self, mock_get_img_backing_file):
+        fake_backing_files = {'base_file': [mock.sentinel.BACKING_FILE],
+                              'resized_files': [mock.sentinel.RESIZED_FILE1,
+                                                mock.sentinel.RESIZED_FILE2]
+                             }
+
+        mock_get_img_backing_file.return_value = fake_backing_files
+
+        self.imagecache._pathutils.get_age_of_file.return_value = 3600
+
+        self.imagecache._remove_if_old_image(mock.sentinel.FAKE_IMAGE_FILE)
+
+        calls = [mock.call(mock.sentinel.BACKING_FILE),
+                 mock.call(mock.sentinel.RESIZED_FILE1),
+                 mock.call(mock.sentinel.RESIZED_FILE2)]
+        self.imagecache._pathutils.get_age_of_file.assert_has_calls(calls)
