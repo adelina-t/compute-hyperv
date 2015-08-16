@@ -70,7 +70,6 @@ class VolumeOps(object):
         self._vmutils = utilsfactory.get_vmutils()
         self._volutils = utilsfactory.get_volumeutils()
         self._initiator = None
-        # asta dispare
         self._default_root_device = 'vda'
         self.volume_drivers = {'smbfs': SMBFSVolumeDriver(),
                                'iscsi': ISCSIVolumeDriver()}
@@ -82,14 +81,8 @@ class VolumeOps(object):
             raise exception.VolumeDriverNotFound(driver_type=driver_type)
         return self.volume_drivers[driver_type]
 
-    def attach_volumes(self, block_device_info, instance_name, ebs_root):
-        mapping = driver.block_device_info_get_mapping(block_device_info)
-
-        if ebs_root:
-            self.attach_volume(mapping[0]['connection_info'],
-                               instance_name, True)
-            mapping = mapping[1:]
-        for vol in mapping:
+    def attach_volumes(self, volumes, instance_name):
+        for vol in volumes:
             self.attach_volume(vol['connection_info'], instance_name)
 
     def disconnect_volumes(self, block_device_info):

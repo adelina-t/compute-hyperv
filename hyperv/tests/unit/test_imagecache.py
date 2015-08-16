@@ -95,10 +95,10 @@ class ImageCacheTestCase(test.NoDBTestCase):
     @mock.patch.object(imagecache.images, 'fetch')
     def test_get_cached_image_with_fetch(self, mock_fetch):
         (expected_path,
-         expected_vhd_path) = self._prepare_get_cached_image(False, False)
+         expected_image_path) = self._prepare_get_cached_image(False, False)
 
         result = self.imagecache.get_cached_image(self.context, self.instance)
-        self.assertEqual(expected_vhd_path, result)
+        self.assertEqual(expected_image_path, result)
 
         mock_fetch.assert_called_once_with(self.context, self.FAKE_IMAGE_REF,
                                            expected_path,
@@ -107,12 +107,12 @@ class ImageCacheTestCase(test.NoDBTestCase):
         self.imagecache._vhdutils.get_vhd_format.assert_called_once_with(
             expected_path)
         self.imagecache._pathutils.rename.assert_called_once_with(
-            expected_path, expected_vhd_path)
+            expected_path, expected_image_path)
 
     @mock.patch.object(imagecache.images, 'fetch')
     def test_get_cached_image_with_fetch_exception(self, mock_fetch):
         (expected_path,
-         expected_vhd_path) = self._prepare_get_cached_image(False, False)
+         expected_image_path) = self._prepare_get_cached_image(False, False)
 
         # path doesn't exist until fetched.
         self.imagecache._pathutils.exists.side_effect = [False, False, True]
@@ -129,15 +129,15 @@ class ImageCacheTestCase(test.NoDBTestCase):
     @mock.patch.object(imagecache.ImageCache, '_resize_and_cache_vhd')
     def test_get_cached_image_use_cow(self, mock_resize):
         (expected_path,
-         expected_vhd_path) = self._prepare_get_cached_image(True, True)
+         expected_image_path) = self._prepare_get_cached_image(True, True)
 
-        expected_resized_vhd_path = expected_vhd_path + 'x'
-        mock_resize.return_value = expected_resized_vhd_path
+        expected_resized_image_path = expected_image_path + 'x'
+        mock_resize.return_value = expected_resized_image_path
 
         result = self.imagecache.get_cached_image(self.context, self.instance)
-        self.assertEqual(expected_resized_vhd_path, result)
+        self.assertEqual(expected_resized_image_path, result)
 
-        mock_resize.assert_called_once_with(self.instance, expected_vhd_path)
+        mock_resize.assert_called_once_with(self.instance, expected_image_path)
 
     @mock.patch.object(imagecache.images, 'fetch')
     def test_cache_rescue_image_bigger_than_flavor(self, mock_fetch):

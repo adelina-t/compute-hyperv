@@ -76,13 +76,12 @@ class VolumeOpsTestCase(test_base.HyperVBaseTestCase):
     def test_attach_volumes(self, mock_attach_volume):
         block_device_info = get_fake_block_dev_info()
 
-        self._volumeops.attach_volumes(block_device_info,
-                                       mock.sentinel.instance_name,
-                                       ebs_root=True)
+        self._volumeops.attach_volumes(block_device_info['block_device_mapping'],
+                                       mock.sentinel.instance_name)
 
         mock_attach_volume.assert_called_once_with(
             block_device_info['block_device_mapping'][0]['connection_info'],
-            mock.sentinel.instance_name, True)
+            mock.sentinel.instance_name)
 
     def test_fix_instance_volume_disk_paths(self):
         block_device_info = get_fake_block_dev_info()
