@@ -275,3 +275,7 @@ class HyperVDriver(driver.ComputeDriver):
 
     def detach_interface(self, instance, vif):
         return self._vmops.detach_interface(instance, vif)
+
+    @property
+    def need_legacy_block_device_info(self):
+        return False

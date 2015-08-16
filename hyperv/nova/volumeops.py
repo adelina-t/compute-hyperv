@@ -70,6 +70,7 @@ class VolumeOps(object):
         self._vmutils = utilsfactory.get_vmutils()
         self._volutils = utilsfactory.get_volumeutils()
         self._initiator = None
+        # asta dispare
         self._default_root_device = 'vda'
         self.volume_drivers = {'smbfs': SMBFSVolumeDriver(),
                                'iscsi': ISCSIVolumeDriver()}
@@ -116,6 +117,7 @@ class VolumeOps(object):
             connection_info=connection_info)
         volume_driver.detach_volume(connection_info, instance_name)
 
+    # metoda asta dispare
     def ebs_root_in_block_devices(self, block_device_info):
         if block_device_info:
             root_device = block_device_info.get('root_device_name')
