@@ -230,9 +230,7 @@ class IOUtils(object):
         return (ctypes.c_ubyte * buff_size)()
 
     def get_buffer_data(self, buff, num_bytes):
-        data = "".join([struct.pack('B', b)
-                        for b in buff[:num_bytes]])
-        return data
+        return bytes(bytearray(buff[:num_bytes]))
 
     def write_buffer_data(self, buff, data):
         for i, c in enumerate(data):
