@@ -195,7 +195,7 @@ class VolumeOps(object):
     def _bytes_per_sec_to_iops(self, no_bytes):
         # Hyper-v uses normalized IOPS (8 KB increments)
         # as IOPS allocation units.
-        return (no_bytes + self._IOPS_BASE_SIZE - 1) / self._IOPS_BASE_SIZE
+        return (no_bytes + self._IOPS_BASE_SIZE - 1) // self._IOPS_BASE_SIZE
 
     def _group_block_devices_by_type(self, block_device_mapping):
         block_devices = collections.defaultdict(list)

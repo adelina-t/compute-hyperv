@@ -145,7 +145,7 @@ class VHDUtils(object):
             fs = VHD_FOOTER_SIZE_DYNAMIC
 
             max_internal_size = (new_vhd_file_size -
-                                 (hs + ddhs + fs)) * bs / (bes + bs)
+                                 (hs + ddhs + fs)) * bs // (bes + bs)
             return max_internal_size
         else:
             vhd_parent = self.get_vhd_parent_path(vhd_path)

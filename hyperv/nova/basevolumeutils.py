@@ -25,7 +25,7 @@ import re
 import sys
 
 if sys.platform == 'win32':
-    import winreg
+    from six.moves import winreg
     import wmi
 
 from nova import block_device

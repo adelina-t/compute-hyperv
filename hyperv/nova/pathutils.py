@@ -72,7 +72,7 @@ class PathUtils(object):
 
     def open(self, path, mode):
         """Wrapper on __builtin__.open used to simplify unit testing."""
-        import builtins
+        from six.moves import builtins
         return builtins.open(path, mode)
 
     def exists(self, path):

@@ -231,7 +231,7 @@ class VMUtils(object):
             mem_settings.DynamicMemoryEnabled = True
             # Must be a multiple of 2
             reserved_mem = min(
-                int(max_mem / dynamic_memory_ratio) >> 1 << 1,
+                int(max_mem // dynamic_memory_ratio) >> 1 << 1,
                 max_mem)
         else:
             mem_settings.DynamicMemoryEnabled = False
