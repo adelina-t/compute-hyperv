@@ -390,12 +390,7 @@ class VMOps(object):
         remote_fx_config = flavor_extra_specs.get(
                 constants.FLAVOR_REMOTE_FX_EXTRA_SPEC_KEY)
         if remote_fx_config:
-            if vm_gen == constants.VM_GEN_2:
-                raise vmutils.HyperVException(_("RemoteFX is not supported "
-                                                "on generation 2 virtual "
-                                                "machines."))
-            else:
-                self._configure_remotefx(instance, remote_fx_config)
+            self._configure_remotefx(instance, vm_gen, remote_fx_config)
 
         self._vmutils.create_scsi_controller(instance_name)
 
@@ -568,7 +563,7 @@ class VMOps(object):
 
         return memory_per_numa_node, cpus_per_numa_node
 
-    def _configure_remotefx(self, instance, config):
+    def _configure_remotefx(self, instance, vm_gen, config):
         if not CONF.hyperv.enable_remotefx:
             raise vmutils.HyperVException(
                 _("enable_remotefx configuration option needs to be set to "
@@ -580,16 +575,23 @@ class VMOps(object):
                         _("The RDS-Virtualization feature must be installed "
                           "in order to use RemoteFX"))
 
+        if not self._vmutils.vm_gen_supports_remotefx(vm_gen):
+            raise vmutils.HyperVException(
+                _("RemoteFX is not supported on generation %s virtual "
+                  "machines on this version of Windows.") % vm_gen)
         instance_name = instance.name
         LOG.debug('Configuring RemoteFX for instance: %s', instance_name)
 
-        (remotefx_max_resolution, remotefx_monitor_count) = config.split(',')
+        (remotefx_max_resolution,
+         remotefx_monitor_count, vram) = config.split(',')
         remotefx_monitor_count = int(remotefx_monitor_count)
+        vram_bytes = int(vram) * units.Mb
 
         self._vmutils.enable_remotefx_video_adapter(
             instance_name,
             remotefx_monitor_count,
-            remotefx_max_resolution)
+            remotefx_max_resolution,
+            vram_bytes)
 
     def attach_config_drive(self, instance, configdrive_path, vm_gen):
         configdrive_ext = configdrive_path[(configdrive_path.rfind('.') + 1):]

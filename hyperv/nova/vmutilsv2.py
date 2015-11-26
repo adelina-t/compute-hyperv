@@ -366,8 +366,30 @@ class VMUtilsV2(vmutils.VMUtils):
                          self._VIRTUAL_SYSTEM_SUBTYPE_GEN1)
         return int(vm_gen.split(':')[-1])
 
+    def vm_gen_supports_remotefx(self, vm_gen):
+        """
+        RemoteFX is supported only for generation 1 virtual machines
+        on Windows 8 / Windows Server 2012 and 2012R2.
+        """
+        if vm_gen == constants.VM_GEN_2:
+            return False
+        return True
+
+    def _configure_3d_display_controller(self, vm, monitor_count,
+        max_resolution, vram_bytes=None):
+
+        synth_3d_disp_ctrl_res = self._get_new_resource_setting_data(
+            self._SYNTH_3D_DISP_CTRL_RES_SUB_TYPE,
+            self._SYNTH_3D_DISP_ALLOCATION_SETTING_DATA_CLASS)
+
+        synth_3d_disp_ctrl_res.MaximumMonitors = monitor_count
+        synth_3d_disp_ctrl_res.MaximumScreenResolution = max_resolution
+
+        self._add_virt_resource(synth_3d_disp_ctrl_res, vm.path_())
+
+
     def enable_remotefx_video_adapter(self, vm_name, monitor_count,
-                                      max_resolution):
+                                      max_resolution, vram_bytes=None):
         vm = self._lookup_vm_check(vm_name)
 
         max_res_value = self._remote_fx_res_map.get(max_resolution)
@@ -400,14 +422,8 @@ class VMUtilsV2(vmutils.VMUtils):
         if synth_disp_ctrl_res_list:
             self._remove_virt_resource(synth_disp_ctrl_res_list[0], vm.path_())
 
-        synth_3d_disp_ctrl_res = self._get_new_resource_setting_data(
-            self._SYNTH_3D_DISP_CTRL_RES_SUB_TYPE,
-            self._SYNTH_3D_DISP_ALLOCATION_SETTING_DATA_CLASS)
-
-        synth_3d_disp_ctrl_res.MaximumMonitors = monitor_count
-        synth_3d_disp_ctrl_res.MaximumScreenResolution = max_res_value
-
-        self._add_virt_resource(synth_3d_disp_ctrl_res, vm.path_())
+        self._configure_3d_display_controller(vm, monitor_count, max_resolution,
+                                              vram_bytes)
 
         s3_disp_ctrl_res = [r for r in rasds if r.ResourceSubType ==
                             self._S3_DISP_CTRL_RES_SUB_TYPE][0]

@@ -20,6 +20,28 @@ class VMUtils10(vmutilsv2.VMUtilsV2):
 
     _UEFI_CERTIFICATE_AUTH = 'MicrosoftUEFICertificateAuthority'
 
+    def vm_gen_supports_remotefx(self, vm_gen):
+        """Returns True
+        RemoteFX is supported on both generation 1 and 2 virtual
+        machines for Windows 10 / Windows Server 2016.
+        """
+        return True
+
+    def _configure_3d_display_controller(self, vm, monitor_count,
+        max_resolution, vram_bytes=None):
+
+        synth_3d_disp_ctrl_res = self._get_new_resource_setting_data(
+            self._SYNTH_3D_DISP_CTRL_RES_SUB_TYPE,
+            self._SYNTH_3D_DISP_ALLOCATION_SETTING_DATA_CLASS)
+
+        synth_3d_disp_ctrl_res.MaximumMonitors = monitor_count
+        synth_3d_disp_ctrl_res.MaximumScreenResolution = max_resolution
+
+        if vram_bytes:
+            synth_3d_disp_ctrl_res.VRAMSizeBytes = unicode(vram_bytes)
+
+        self._add_virt_resource(synth_3d_disp_ctrl_res, vm.path_())
+
     def _set_secure_boot(self, vs_data, certificate_required):
         vs_data.SecureBootEnabled = True
         if certificate_required:
