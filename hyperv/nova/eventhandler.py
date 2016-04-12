@@ -47,8 +47,6 @@ class InstanceEventHandler(object):
         constants.HYPERV_VM_STATE_ENABLED: virtevent.EVENT_LIFECYCLE_STARTED,
         constants.HYPERV_VM_STATE_DISABLED: virtevent.EVENT_LIFECYCLE_STOPPED,
         constants.HYPERV_VM_STATE_PAUSED: virtevent.EVENT_LIFECYCLE_PAUSED,
-        constants.HYPERV_VM_STATE_SUSPENDED:
-            virtevent.EVENT_LIFECYCLE_SUSPENDED
     }
 
     def __init__(self, state_change_callback=None):

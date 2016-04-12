@@ -25,8 +25,8 @@ import time
 from eventlet import timeout as etimeout
 from nova.api.metadata import base as instance_metadata
 from nova.compute import vm_states
+from nova.openstack.common import fileutils
 from nova import exception
-from nova import objects
 from nova import utils
 from nova.virt import configdrive
 from nova.virt import hardware
@@ -38,7 +38,6 @@ from oslo_config import cfg
 from oslo_log import log as logging
 from oslo_service import loopingcall
 from oslo_utils import excutils
-from oslo_utils import fileutils
 from oslo_utils import units
 from oslo_utils import uuidutils
 import six
@@ -572,8 +571,6 @@ class VMOps(object):
         :raises exception.InstanceUnacceptable:
             If the given instance NUMA topology is not possible on Hyper-V.
         """
-        image_meta = objects.ImageMeta.from_dict(image_meta)
-
         instance_topology = hardware.numa_get_constraints(instance.flavor,
                                                           image_meta)
         if not instance_topology:
