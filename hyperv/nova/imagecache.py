@@ -78,8 +78,13 @@ class ImageCache(imagecache.ImageCacheManager):
                     vhd_path, root_vhd_size))
 
         if root_vhd_internal_size < vhd_size:
-            raise exception.FlavorDiskSmallerThanImage(
-                flavor_size=root_vhd_size, image_size=vhd_size)
+            err_msg = _('Cannot resize the image to a size smaller than the VHD '
+                        'max internal size. '
+                        'Internal size: %(vhd_size)s. '
+                        'Requested disk size: %(root_vhd_size)s. ')
+            raise exception.FlavorDiskTooSmall(err_msg %
+                {'vhd_size': vhd_size,
+                 'root_vhd_size': root_vhd_size})
         if root_vhd_internal_size > vhd_size:
             path_parts = os.path.splitext(vhd_path)
             resized_vhd_path = '%s_%s%s' % (path_parts[0],
@@ -175,7 +180,7 @@ class ImageCache(imagecache.ImageCacheManager):
                         'Rescue image size: %(rescue_image_size)s. '
                         'Flavor disk size:%(flavor_disk_size)s. '
                         'Rescue image id %(rescue_image_id)s.')
-            raise exception.FlavorDiskSmallerThanImage(err_msg %
+            raise exception.FlavorDiskTooSmall(err_msg %
                 {'rescue_image_size': rescue_image_size,
                  'flavor_disk_size': flavor_disk_size,
                  'rescue_image_id': rescue_image_id})

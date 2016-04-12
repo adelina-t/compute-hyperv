@@ -102,8 +102,11 @@ class SerialConsoleOps(object):
                         log += fp.read()
             return log
         except IOError as err:
-            raise exception.ConsoleLogOutputException(
-                instance_id=instance_name, reason=six.text_type(err))
+            mgs = (_("Could not get instance %(instance_name)s "
+                     "console output. Error: %(err)s") %
+                   {'instance_name': instance_name,
+                    'err': six.text_type(err)})
+            raise exception.NovaException(msg)
 
     def start_console_handlers(self):
         active_instances = self._vmutils.get_active_instances()

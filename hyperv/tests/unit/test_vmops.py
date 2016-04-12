@@ -156,7 +156,7 @@ class VMOpsTestCase(test_base.HyperVBaseTestCase):
         mock_get_cached_image.return_value = fake_vhd_path
         fake_root_path = self._vmops._pathutils.get_root_vhd_path.return_value
 
-        self.assertRaises(exception.FlavorDiskSmallerThanImage,
+        self.assertRaises(exception.FlavorDiskTooSmall,
                           self._vmops._create_root_vhd, self.context,
                           mock_instance)
 
@@ -814,7 +814,7 @@ class VMOpsTestCase(test_base.HyperVBaseTestCase):
             expected_get_configdrive_path_calls.append(expected_call)
 
         if config_drive_format != self.ISO9660:
-            self.assertRaises(exception.ConfigDriveUnsupportedFormat,
+            self.assertRaises(exception.NovaException,
                               self._vmops._create_config_drive,
                               mock_instance, [mock.sentinel.FILE],
                               mock.sentinel.PASSWORD,

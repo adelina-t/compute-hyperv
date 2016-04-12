@@ -58,7 +58,7 @@ class ImageCacheTestCase(test_base.HyperVBaseTestCase):
             self.imagecache._vhdutils.get_internal_vhd_size_by_file_size)
         mock_internal_vhd_size.return_value = self.FAKE_VHD_SIZE_GB * units.Gi
 
-        self.assertRaises(exception.FlavorDiskSmallerThanImage,
+        self.assertRaises(exception.FlavorDiskTooSmall,
                           self.imagecache._resize_and_cache_vhd,
                           mock.sentinel.instance,
                           mock.sentinel.vhd_path)
@@ -167,7 +167,7 @@ class ImageCacheTestCase(test_base.HyperVBaseTestCase):
          expected_vhd_path) = self._prepare_get_cached_image(
             rescue_image_id=fake_rescue_image_id,
             image_format=constants.DISK_FORMAT_VHD)
-        self.assertRaises(exception.FlavorDiskSmallerThanImage,
+        self.assertRaises(exception.FlavorDiskTooSmall,
                           self.imagecache.get_cached_image,
                           self.context, self.instance,
                           fake_rescue_image_id)

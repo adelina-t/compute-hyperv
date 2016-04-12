@@ -461,7 +461,7 @@ class ISCSIVolumeDriver(BaseVolumeDriver):
                               target_iqn)
 
         if not volume_connected:
-            raise exception.VolumeAttachFailed(
+            raise exception.NovaException(
                 _("Could not connect volume %s.") %
                 connection_properties['volume_id'])
 

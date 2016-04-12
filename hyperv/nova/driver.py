@@ -126,11 +126,12 @@ class HyperVDriver(driver.ComputeDriver):
             # the version is of Windows is older than Windows Server 2012 R2.
             # Log an error, letting users know that this version is not
             # supported any longer.
-            LOG.error(_LE('You are running nova-compute on an unsupported '
+            err_msg = _LE('You are running nova-compute on an unsupported '
                           'version of Windows (older than Windows / Hyper-V '
                           'Server 2012). The support for this version of '
-                          'Windows has been removed in Mitaka.'))
-            raise exception.HypervisorTooOld(version='6.2')
+                          'Windows has been removed in Mitaka.')
+            LOG.error(err_msg)
+            raise exception.NovaException(err_msg)
 
     @property
     def need_legacy_block_device_info(self):

@@ -58,7 +58,7 @@ class HyperVDriverTestCase(test_base.HyperVBaseTestCase):
         mock_hostutils = mock_get_hostutils.return_value
         mock_hostutils.check_min_windows_version.return_value = False
 
-        self.assertRaises(exception.HypervisorTooOld,
+        self.assertRaises(exception.NovaException,
                           self.driver._check_minimum_windows_version)
 
     def test_public_api_signatures(self):

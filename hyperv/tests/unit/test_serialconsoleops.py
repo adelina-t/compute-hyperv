@@ -98,7 +98,7 @@ class SerialConsoleOpsTestCase(test_base.HyperVBaseTestCase):
         fake_open.side_effect = IOError
         fake_path_exists.return_value = True
 
-        self.assertRaises(exception.ConsoleLogOutputException,
+        self.assertRaises(exception.NovaException,
                           self._serialops.get_console_output,
                           mock.sentinel.instance_name)
         fake_open.assert_called_once_with(mock.sentinel.log_path, 'rb')

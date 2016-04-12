@@ -609,7 +609,7 @@ class ISCSIVolumeDriverTestCase(test_base.HyperVBaseTestCase):
         self._iscsi_utils.login_storage_target.side_effect = (
             os_win_exc.OSWinException)
 
-        self.assertRaises(exception.VolumeAttachFailed,
+        self.assertRaises(exception.NovaException,
                           self._volume_driver.connect_volume,
                           get_fake_connection_info())
 

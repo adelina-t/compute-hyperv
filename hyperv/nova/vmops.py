@@ -253,8 +253,13 @@ class VMOps(object):
 
     def _is_resize_needed(self, vhd_path, old_size, new_size, instance):
         if new_size < old_size:
-            raise exception.FlavorDiskSmallerThanImage(
-                flavor_size=new_size, image_size=old_size)
+            err_msg = _('Cannot resize the image to a size smaller than the VHD '
+                        'max internal size. '
+                        'Internal size: %(vhd_size)s. '
+                        'Requested disk size: %(root_vhd_size)s. ')
+            raise exception.FlavorDiskTooSmall(err_msg %
+                {'vhd_size': vhd_size,
+                 'root_vhd_size': root_vhd_size})
         elif new_size > old_size:
             LOG.debug("Resizing VHD %(vhd_path)s to new "
                       "size %(new_size)s",
@@ -512,8 +517,9 @@ class VMOps(object):
     def _create_config_drive(self, instance, injected_files, admin_password,
                              network_info, rescue=False):
         if CONF.config_drive_format != 'iso9660':
-            raise exception.ConfigDriveUnsupportedFormat(
-                format=CONF.config_drive_format)
+            raise exception.NovaException(
+                _('Invalid config drive format "%s"') %
+                CONF.config_drive_format)
 
         LOG.info(_LI('Using config drive for instance'), instance=instance)
 
