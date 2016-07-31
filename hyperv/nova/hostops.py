@@ -191,9 +191,9 @@ class HostOps(object):
                'hypervisor_hostname': platform.node(),
                'vcpus_used': 0,
                'cpu_info': jsonutils.dumps(cpu_info),
-               'supported_instances':
+               'supported_instances': jsonutils.dumps(
                    [(arch.I686, hv_type.HYPERV, vm_mode.HVM),
-                    (arch.X86_64, hv_type.HYPERV, vm_mode.HVM)],
+                    (arch.X86_64, hv_type.HYPERV, vm_mode.HVM)]),
                }
         dic.update(gpu_info)
 
