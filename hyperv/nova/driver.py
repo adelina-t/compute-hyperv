@@ -22,7 +22,6 @@ import platform
 import sys
 
 from nova import exception
-from nova import image
 from nova.virt import driver
 from os_win import exceptions as os_win_exc
 from os_win import utilsfactory
@@ -118,7 +117,6 @@ class HyperVDriver(driver.ComputeDriver):
         self._rdpconsoleops = rdpconsoleops.RDPConsoleOps()
         self._serialconsoleops = serialconsoleops.SerialConsoleOps()
         self._imagecache = imagecache.ImageCache()
-        self._image_api = image.API()
         self._pathutils = pathutils.PathUtils()
 
     def _check_minimum_windows_version(self):
@@ -154,7 +152,6 @@ class HyperVDriver(driver.ComputeDriver):
 
     def spawn(self, context, instance, image_meta, injected_files,
               admin_password, network_info=None, block_device_info=None):
-        image_meta = self._recreate_image_meta(context, instance, image_meta)
         self._vmops.spawn(context, instance, image_meta, injected_files,
                           admin_password, network_info, block_device_info)
 
@@ -327,7 +324,6 @@ class HyperVDriver(driver.ComputeDriver):
     def finish_migration(self, context, migration, instance, disk_info,
                          network_info, image_meta, resize_instance,
                          block_device_info=None, power_on=True):
-        image_meta = self._recreate_image_meta(context, instance, image_meta)
         self._migrationops.finish_migration(context, migration, instance,
                                             disk_info, network_info,
                                             image_meta, resize_instance,
@@ -353,7 +349,6 @@ class HyperVDriver(driver.ComputeDriver):
 
     def rescue(self, context, instance, network_info, image_meta,
                rescue_password):
-        image_meta = self._recreate_image_meta(context, instance, image_meta)
         try:
             self._vmops.rescue_instance(context, instance, network_info,
                                         image_meta, rescue_password)
@@ -372,12 +367,3 @@ class HyperVDriver(driver.ComputeDriver):
 
     def host_maintenance_mode(self, host, mode):
         return self._hostops.host_maintenance_mode(host, mode)
-
-    def _recreate_image_meta(self, context, instance, image_meta):
-        if image_meta.obj_attr_is_set("id"):
-            image_ref = image_meta.id
-        else:
-            image_ref = instance.system_metadata['image_base_image_ref']
-        image_meta = self._image_api.get(context, image_ref)
-        image_meta["id"] = image_ref
-        return image_meta
