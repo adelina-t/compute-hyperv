@@ -18,7 +18,6 @@
 from nova.compute import power_state
 from nova.compute import task_states
 from nova.compute import vm_states
-import nova.conf
 from nova import context
 from nova import network
 from nova import objects
@@ -40,7 +39,7 @@ hyperv_cluster_opts = [
                default=2),
 ]
 
-CONF = nova.conf.CONF
+CONF = cfg.CONF
 CONF.register_opts(hyperv_cluster_opts, 'hyperv')
 
 
